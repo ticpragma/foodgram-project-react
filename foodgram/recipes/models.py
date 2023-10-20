@@ -2,14 +2,14 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
 
-
 User = get_user_model()
+
 
 class Tag(models.Model):
     name = models.CharField(
         max_length=200,
         blank=False,
-        )
+    )
     color = models.CharField(
         max_length=7,
         blank=False
@@ -25,11 +25,12 @@ class Tag(models.Model):
         ]
     )
 
-class Ingridient(models.Model):
+
+class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
         blank=False,
-        )
+    )
     measurement_unit = models.CharField(
         max_length=200,
         blank=False
@@ -38,9 +39,9 @@ class Ingridient(models.Model):
 
 class Recipe(models.Model):
     ingredients = models.ManyToManyField(
-        Ingridient,
+        Ingredient,
         related_name='recipes',
-        through='RecipeAndIngredient'
+        through='IngredientAmount'
     )
     tags = models.ManyToManyField(
         Tag,
@@ -63,17 +64,44 @@ class Recipe(models.Model):
         related_name='recipes'
     )
 
-class RecipeAndIngredient(models.Model):
+
+class IngredientAmount(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='full_ingredient'
     )
     ingredient = models.ForeignKey(
-        Ingridient,
+        Ingredient,
         on_delete=models.CASCADE,
         related_name='full_ingredient'
     )
     amount = models.IntegerField(
         blank=False
+    )
+
+
+class Favorite(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorite'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite'
+    )
+
+
+class ShoppingCart(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='cart'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='cart'
     )
