@@ -1,6 +1,9 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
+from django.db.models import UniqueConstraint
+from django.core.validators import MinValueValidator
+
 
 User = get_user_model()
 
@@ -55,7 +58,7 @@ class Recipe(models.Model):
     )
     text = models.CharField(max_length=1000)
     cooking_time = models.IntegerField(
-        blank=False
+        validators=(MinValueValidator(1), )
     )
     author = models.ForeignKey(
         User,
@@ -79,6 +82,17 @@ class IngredientAmount(models.Model):
     amount = models.IntegerField(
         blank=False
     )
+
+    class Meta:
+        constraints = (
+            UniqueConstraint(
+                fields=(
+                    "recipe",
+                    "ingredient",
+                ),
+                name='Not unique ingredient',
+            ),
+        )
 
 
 class Favorite(models.Model):

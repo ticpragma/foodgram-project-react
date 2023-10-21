@@ -1,20 +1,14 @@
-from django.shortcuts import render
-from .models import User, Subscribe
-from rest_framework import viewsets
-from .serializers import UserSerializer
+from djoser.views import UserViewSet
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class DjoserUserViewSet(UserViewSet):
+    pagination_class = LimitOffsetPagination
+    permission_classes = [IsAuthenticated]
 
-    @action(methods=['post'], detail=True, url_path='subscribe')
-    def subscribe(self, request, pk):
-        current_user = request.user
-        who_to_follow = User.objects.filter(id=pk)
-        Subscribe.objects.create(user=current_user, author=who_to_follow)
-        serializer = UserSerializer(who_to_follow)
-        return Response(serializer.data)
+    def me(self, request, *args, **kwargs):
+        response = super().me(request, *args, **kwargs)
+        response.data['is_subscribed'] = False
+        return response
