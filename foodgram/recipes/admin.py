@@ -7,6 +7,7 @@ admin.site.register(Favorite)
 
 admin.site.register(IngredientAmount)
 
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     pass

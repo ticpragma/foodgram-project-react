@@ -37,22 +37,21 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ('name',)
 
 
-class UserPermission(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if view.action == 'retrieve':
-            return request.user.is_authenticated()
-        return True
-
-
 class RecipeViewSet(viewsets.ModelViewSet):
-    permission_classes = (OwnerOrReadOnly,)
     queryset = Recipe.objects.all()
+    permission_classes = (OwnerOrReadOnly,)
 
     def get_queryset(self):
         queryset = Recipe.objects.all()
         author = self.request.query_params.get('author', None)
         if author is not None:
             queryset = queryset.filter(author=author)
+        is_in_shopping_cart = self.request.query_params.get('is_in_shopping_cart', None)
+        if is_in_shopping_cart is not None and is_in_shopping_cart == '1':
+            queryset = queryset.filter(favorite__user_id=self.request.user.id)
+        is_favorited = self.request.query_params.get('is_favorited', None)
+        if is_favorited is not None and is_favorited == '1':
+            queryset = queryset.filter(cart__user=self.request.user.id)
         return queryset
 
     def get_serializer_class(self):
@@ -127,7 +126,11 @@ class SubAPIView(APIView):
             to_user = get_object_or_404(User, pk=pk)
             if user != to_user and not Subscribe.objects.filter(user=user, author=to_user).exists():
                 Subscribe.objects.create(user=user, author=to_user)
-                serializer = SubscribeUserSerializerPres(to_user)
+                limit = request.query_params.get('recipes_limit', None)
+                context = {}
+                if limit:
+                    context['limit'] = int(limit)
+                serializer = SubscribeUserSerializerPres(to_user, context=context)
                 return Response(status=status.HTTP_201_CREATED, data=serializer.data)
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -148,8 +151,17 @@ class SubViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        limit = self.request.query_params.get('recipes_limit', None)
+        queryset = Subscribe.objects.filter(user=user)
+        if limit:
+            self.limit = int(limit)
         res = []
-        for sub_user in Subscribe.objects.filter(user=user):
+        for sub_user in queryset:
             res.append(sub_user.author)
-        print(res)
         return res
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if hasattr(self, 'limit'):
+            context['limit'] = self.limit
+        return context

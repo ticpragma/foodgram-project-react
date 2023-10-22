@@ -111,6 +111,28 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = '__all__'
 
+    def validate(self, attrs):
+        ingredients = attrs.get('full_ingredient', None)
+        if not ingredients:
+            raise serializers.ValidationError('Поле ingredients не должно быть пустым')
+        unique = set()
+        for i in ingredients:
+            id = i['ingredient_id']
+            if not Ingredient.objects.filter(id=id).exists():
+                raise serializers.ValidationError('Все ингредиенты должны существовать')
+            unique.add(id)
+        if len(unique) != len(ingredients):
+            raise serializers.ValidationError('Не должно быть повторяющихся ингредиентов')
+        tags = attrs.get('tags', None)
+        if not tags:
+            raise serializers.ValidationError('Поле tags не должно быть пустым')
+        if len(set(tags)) != len(tags):
+            raise serializers.ValidationError('Не должно быть повторяющихся тэгов')
+        if not attrs.get('image', None):
+            raise serializers.ValidationError('Поле image не должно быть пустым')
+        validated = super().validate(attrs)
+        return validated
+
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('full_ingredient')
@@ -243,8 +265,15 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
             'recipes_count'
         )
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if 'limit' in self.context and self.context['limit'] < len(data['recipes']):
+            data['recipes'] = data['recipes'][:self.context['limit']]
+        return data
+
     def get_recipes_count(self, obj):
-        return obj.recipes.count()
+        recipes_count = obj.recipes.count()
+        return min(self.context.get('limit', recipes_count), recipes_count)
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
@@ -272,8 +301,15 @@ class SubscribeUserSerializerPres(serializers.ModelSerializer):
             'recipes_count'
         )
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if 'limit' in self.context and self.context['limit'] < len(data['recipes']):
+            data['recipes'] = data['recipes'][:self.context['limit']]
+        return data
+
     def get_recipes_count(self, obj):
-        return obj.recipes.count()
+        recipes_count = obj.recipes.count()
+        return min(self.context.get('limit', recipes_count), recipes_count)
 
     def get_is_subscribed(self, obj):
         user = User.objects.get(id=obj.id)

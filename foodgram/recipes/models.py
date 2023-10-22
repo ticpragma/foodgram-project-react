@@ -3,7 +3,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
 from django.db.models import UniqueConstraint
 from django.core.validators import MinValueValidator
-
+from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -44,7 +44,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         related_name='recipes',
-        through='IngredientAmount'
+        through='IngredientAmount',
     )
     tags = models.ManyToManyField(
         Tag,
@@ -58,7 +58,7 @@ class Recipe(models.Model):
     )
     text = models.CharField(max_length=1000)
     cooking_time = models.IntegerField(
-        validators=(MinValueValidator(1), )
+        validators=(MinValueValidator(1),)
     )
     author = models.ForeignKey(
         User,
