@@ -102,6 +102,7 @@ DJOSER = {
     },
 }
 
+
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
