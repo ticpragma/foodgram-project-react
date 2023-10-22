@@ -3,8 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 username_validator = RegexValidator(
-    regex=r'^[\w.@+-]+\Z',
-    message='Значение поля username не соответствует регулярному выражению ^[\w.@+-]+\Z'
+    message='Значение поля username не соответствует регулярному выражен'
 )
 
 
