@@ -1,5 +1,4 @@
 from rest_framework import viewsets, permissions
-from rest_framework.permissions import IsAuthenticated
 
 from users.models import Subscribe
 from .models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, IngredientAmount
@@ -124,14 +123,17 @@ class SubAPIView(APIView):
         if request.user and request.user.is_authenticated:
             user = request.user
             to_user = get_object_or_404(User, pk=pk)
-            if user != to_user and not Subscribe.objects.filter(user=user, author=to_user).exists():
+            if user != to_user and not Subscribe.objects.filter(user=user,
+                                                                author=to_user).exists():
                 Subscribe.objects.create(user=user, author=to_user)
                 limit = request.query_params.get('recipes_limit', None)
                 context = {}
                 if limit:
                     context['limit'] = int(limit)
-                serializer = SubscribeUserSerializerPres(to_user, context=context)
-                return Response(status=status.HTTP_201_CREATED, data=serializer.data)
+                serializer = SubscribeUserSerializerPres(to_user,
+                                                         context=context)
+                return Response(status=status.HTTP_201_CREATED,
+                                data=serializer.data)
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -139,7 +141,9 @@ class SubAPIView(APIView):
         if request.user and request.user.is_authenticated:
             user = request.user
             to_user = get_object_or_404(User, pk=pk)
-            if user != to_user and Subscribe.objects.filter(user=user, author=to_user).exists():
+            if (user != to_user
+                and Subscribe.objects.filter(user=user,
+                                             author=to_user).exists()):
                 Subscribe.objects.get(user=user, author=to_user).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(status=status.HTTP_400_BAD_REQUEST)

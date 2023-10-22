@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Tag, Ingredient, Recipe, IngredientAmount, Favorite, ShoppingCart
+from .models import (Tag,
+                     Ingredient,
+                     Recipe,
+                     IngredientAmount,
+                     Favorite,
+                     ShoppingCart)
 from users.models import Subscribe
 from drf_extra_fields.fields import Base64ImageField
 
@@ -82,7 +87,8 @@ class AuthorSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            if Subscribe.objects.filter(author=User.objects.get(id=obj.id), user=user).exists():
+            if Subscribe.objects.filter(
+                author=User.objects.get(id=obj.id), user=user).exists():
                 return True
         return False
 
@@ -93,7 +99,9 @@ def ingredient_amount_create(recipe, ingredients):
         d = dict(i)
         objs.append(
             IngredientAmount(
-                recipe=recipe, ingredient=Ingredient.objects.all().get(id=d['ingredient_id']), amount=d['amount']
+                recipe=recipe,
+                ingredient=Ingredient.objects.all().get(
+                    id=d['ingredient_id']), amount=d['amount']
             )
         )
     IngredientAmount.objects.bulk_create(objs)

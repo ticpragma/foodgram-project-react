@@ -3,7 +3,6 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
 from django.db.models import UniqueConstraint
 from django.core.validators import MinValueValidator
-from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
