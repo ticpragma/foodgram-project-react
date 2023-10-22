@@ -89,7 +89,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if user.is_authenticated:
             if Subscribe.objects.filter(
-                author=User.objects.get(id=obj.id), user=user).exists():
+                    author=User.objects.get(id=obj.id), user=user).exists():
                 return True
         return False
 
@@ -109,7 +109,9 @@ def ingredient_amount_create(recipe, ingredients):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True, write_only=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True, write_only=True)
     ingredients = AddIngredientSerializer(many=True, source='full_ingredient')
     image = Base64ImageField()
     author = AuthorSerializer(read_only=True)
@@ -123,22 +125,28 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         ingredients = attrs.get('full_ingredient', None)
         if not ingredients:
-            raise serializers.ValidationError('Поле ingredients не должно быть пустым')
+            raise serializers.ValidationError(
+                'Поле ingredients не должно быть пустым')
         unique = set()
         for i in ingredients:
             id = i['ingredient_id']
             if not Ingredient.objects.filter(id=id).exists():
-                raise serializers.ValidationError('Все ингредиенты должны существовать')
+                raise serializers.ValidationError(
+                    'Все ингредиенты должны существовать')
             unique.add(id)
         if len(unique) != len(ingredients):
-            raise serializers.ValidationError('Не должно быть повторяющихся ингредиентов')
+            raise serializers.ValidationError(
+                'Не должно быть повторяющихся ингредиентов')
         tags = attrs.get('tags', None)
         if not tags:
-            raise serializers.ValidationError('Поле tags не должно быть пустым')
+            raise serializers.ValidationError(
+                'Поле tags не должно быть пустым')
         if len(set(tags)) != len(tags):
-            raise serializers.ValidationError('Не должно быть повторяющихся тэгов')
+            raise serializers.ValidationError(
+                'Не должно быть повторяющихся тэгов')
         if not attrs.get('image', None):
-            raise serializers.ValidationError('Поле image не должно быть пустым')
+            raise serializers.ValidationError(
+                'Поле image не должно быть пустым')
         validated = super().validate(attrs)
         return validated
 
@@ -276,7 +284,8 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        if 'limit' in self.context and self.context['limit'] < len(data['recipes']):
+        if ('limit' in self.context
+                and self.context['limit'] < len(data['recipes'])):
             data['recipes'] = data['recipes'][:self.context['limit']]
         return data
 
@@ -287,7 +296,8 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            if Subscribe.objects.filter(author=User.objects.get(id=obj.id), user=user).exists():
+            if Subscribe.objects.filter(
+                    author=User.objects.get(id=obj.id), user=user).exists():
                 return True
         return False
 
@@ -312,7 +322,8 @@ class SubscribeUserSerializerPres(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        if 'limit' in self.context and self.context['limit'] < len(data['recipes']):
+        if ('limit' in self.context
+                and self.context['limit'] < len(data['recipes'])):
             data['recipes'] = data['recipes'][:self.context['limit']]
         return data
 

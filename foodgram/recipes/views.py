@@ -1,9 +1,18 @@
 from rest_framework import viewsets, permissions
-
 from users.models import Subscribe
-from .models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, IngredientAmount
-from .serializers import TagSerializer, IngredientSerializer, RecipeSerializer, RecipeListSerializer, \
-    FavoriteSerializer, SubscribeUserSerializer, SubscribeUserSerializerPres
+from .models import (Tag,
+                     Ingredient,
+                     Recipe,
+                     Favorite,
+                     ShoppingCart,
+                     IngredientAmount)
+from .serializers import (TagSerializer,
+                          IngredientSerializer,
+                          RecipeSerializer,
+                          RecipeListSerializer,
+                          FavoriteSerializer,
+                          SubscribeUserSerializer,
+                          SubscribeUserSerializerPres)
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -45,7 +54,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         author = self.request.query_params.get('author', None)
         if author is not None:
             queryset = queryset.filter(author=author)
-        is_in_shopping_cart = self.request.query_params.get('is_in_shopping_cart', None)
+        is_in_shopping_cart = \
+            self.request.query_params.get(
+                'is_in_shopping_cart', None)
         if is_in_shopping_cart is not None and is_in_shopping_cart == '1':
             queryset = queryset.filter(favorite__user_id=self.request.user.id)
         is_favorited = self.request.query_params.get('is_favorited', None)
@@ -65,16 +76,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk):
         if request.method == 'POST':
             if Recipe.objects.filter(pk=pk).exists():
-                if not Favorite.objects.filter(user=request.user, recipe=get_object_or_404(Recipe, pk=pk)).exists():
-                    Favorite.objects.create(user=request.user, recipe=get_object_or_404(Recipe, pk=pk))
+                if not Favorite.objects.filter(
+                    user=request.user,
+                        recipe=get_object_or_404(Recipe, pk=pk)).exists():
+                    Favorite.objects.create(
+                        user=request.user,
+                        recipe=get_object_or_404(Recipe, pk=pk))
                     recipe = Recipe.objects.get(id=pk)
                     serializer = FavoriteSerializer(recipe)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    return Response(serializer.data,
+                                    status=status.HTTP_201_CREATED)
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             return Response(status=status.HTTP_400_BAD_REQUEST)
         elif request.method == 'DELETE':
-            if Favorite.objects.filter(user=request.user, recipe=get_object_or_404(Recipe, pk=pk)).exists():
-                Favorite.objects.filter(user=request.user, recipe=get_object_or_404(Recipe, pk=pk)).delete()
+            if Favorite.objects.filter(
+                    user=request.user,
+                    recipe=get_object_or_404(Recipe, pk=pk)).exists():
+                Favorite.objects.filter(
+                    user=request.user,
+                    recipe=get_object_or_404(Recipe, pk=pk)).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -84,15 +104,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             if Recipe.objects.filter(pk=pk).exists():
                 recipe = get_object_or_404(Recipe, pk=pk)
-                if not ShoppingCart.objects.filter(user=request.user, recipe=recipe).exists():
-                    ShoppingCart.objects.create(user=request.user, recipe=recipe)
+                if not ShoppingCart.objects.filter(user=request.user,
+                                                   recipe=recipe).exists():
+                    ShoppingCart.objects.create(user=request.user,
+                                                recipe=recipe)
                     serializer = FavoriteSerializer(recipe)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    return Response(serializer.data,
+                                    status=status.HTTP_201_CREATED)
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             return Response(status=status.HTTP_400_BAD_REQUEST)
         elif request.method == 'DELETE':
-            if ShoppingCart.objects.filter(user=request.user, recipe=get_object_or_404(Recipe, pk=pk)).exists():
-                ShoppingCart.objects.filter(user=request.user, recipe=get_object_or_404(Recipe, pk=pk)).delete()
+            if (ShoppingCart.objects.filter(
+                    user=request.user,
+                    recipe=get_object_or_404(Recipe, pk=pk)).exists()):
+                ShoppingCart.objects.filter(
+                    user=request.user,
+                    recipe=get_object_or_404(Recipe, pk=pk)).delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -107,8 +134,11 @@ class DownloadShoppingCartAPIView(APIView):
             ingr_amount = IngredientAmount.objects.filter(recipe=recipe)
             for ingr_am in ingr_amount:
                 ingredients = Ingredient.objects.get(id=ingr_am.ingredient.id)
-                ingredient_dict[(ingredients.name, ingredients.measurement_unit)] = ingredient_dict.get(
-                    (ingredients.name, ingredients.measurement_unit), 0) + ingr_am.amount
+                a = ingredients.name
+                b = ingredients.measurement_unit
+                c = ingr_am.amount
+                (ingredient_dict[(a, a)]) = \
+                    (ingredient_dict.get((a, b), 0) + c)
         content = 'Список ингредиентов:'
         for (name, unit), amount in ingredient_dict.items():
             content = content + '\n' + name + ' ' + str(amount) + ' ' + unit
@@ -123,8 +153,9 @@ class SubAPIView(APIView):
         if request.user and request.user.is_authenticated:
             user = request.user
             to_user = get_object_or_404(User, pk=pk)
-            if user != to_user and not Subscribe.objects.filter(user=user,
-                                                                author=to_user).exists():
+            if (user != to_user
+                and not Subscribe.objects.filter(user=user,
+                                                 author=to_user).exists()):
                 Subscribe.objects.create(user=user, author=to_user)
                 limit = request.query_params.get('recipes_limit', None)
                 context = {}
