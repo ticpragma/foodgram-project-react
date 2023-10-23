@@ -13,10 +13,12 @@ SECRET_KEY = '#p6)hrt6s_gia$8#bpquk^h4&%8aj^b(3n8zuoj0i1_b8yudsy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'practicum-mitin.sytes.net']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://practicum-mitin.sytes.net'
+    'https://practicum-mitin.sytes.net',
+    'http://localhost',
+    'http://127.0.0.1:8000',
 ]
 
 AUTH_USER_MODEL = 'users.User'
