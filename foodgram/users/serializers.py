@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import User, Subscribe
 
 
@@ -55,8 +56,6 @@ class CustomUserSerializerSub(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        if user.is_authenticated:
-            if Subscribe.objects.filter(
-                    author=User.objects.get(id=obj.id), user=user).exists():
-                return True
-        return False
+        user = self.context['request'].user
+        return (user.is_authenticated
+                and user.current_user.all().filter(author=obj).exists())

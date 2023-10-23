@@ -12,40 +12,62 @@ class User(AbstractUser):
         blank=False,
         unique=True,
         max_length=254,
-        verbose_name='мейл'
+        verbose_name='мейл',
+        help_text='Добавьте имейл'
     )
     username = models.CharField(
         blank=False,
         unique=True,
         max_length=150,
-        verbose_name='пользователь',
+        verbose_name='Юзернейм',
+        help_text='Добавьте юзернейм',
         validators=[username_validator]
     )
     first_name = models.CharField(
         blank=False,
         max_length=150,
-        verbose_name='имя'
+        verbose_name='имя',
+        help_text='Введите имя'
     )
     last_name = models.CharField(
         blank=False,
         max_length=150,
-        verbose_name='фаиилия'
+        verbose_name='Фаиилия',
+        help_text='Введите фамилию'
     )
     password = models.CharField(
         blank=False,
-        max_length=150
+        max_length=150,
+        verbose_name='Пароль',
+        help_text='Введите пароль'
     )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'password']
+
+    class Meta:
+        ordering = ['username']
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+
+    
 
 class Subscribe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='recipe_author'
+        related_name='recipe_author',
+        verbose_name='Автор'
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='current_user'
+        related_name='current_user',
+        verbose_name='Залогиненный пользователь'
     )
+
+    class Meta:
+        ordering = ['user']
+
+    def __str__(self):
+        return f'{self.author}, {self.user}'
