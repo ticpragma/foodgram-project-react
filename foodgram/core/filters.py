@@ -13,6 +13,7 @@ class CustomFilterIngredient(filters.FilterSet):
         model = Ingredient
         fields = ('name', )
 
+
 class CustomFlterRecipeTags(filters.FilterSet):
 
     tags = filters.ModelMultipleChoiceFilter(

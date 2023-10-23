@@ -99,7 +99,8 @@ def ingredient_amount_create(recipe, ingredients):
             IngredientAmount(
                 recipe=recipe,
                 ingredient=Ingredient.objects.all().get(
-                    id=ingredient['ingredient_id']), amount=ingredient['amount']
+                    id=ingredient['ingredient_id']),
+                    amount=ingredient['amount']
             )
         )
     IngredientAmount.objects.bulk_create(objs)
@@ -144,7 +145,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Не должно быть повторяющихся ингредиентов')
         return ingredients
-        
+
     def validate_tags(self, tags):
         if not tags:
             raise serializers.ValidationError(
@@ -153,7 +154,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Не должно быть повторяющихся тэгов')
         return tags
-        
+
     def validate_image(self, image):
         if not image:
             raise serializers.ValidationError(

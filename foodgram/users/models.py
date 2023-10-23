@@ -2,10 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 
-username_validator = RegexValidator(
-    regex=r'^[\w.@+-]+\Z',
-    message='Значение поля username не соответствует регулярному выражению ^[\w.@+-]+\Z'
-)
+username_validator = RegexValidator()
+
 
 class User(AbstractUser):
     email = models.EmailField(
@@ -50,7 +48,6 @@ class User(AbstractUser):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
-    
 
 class Subscribe(models.Model):
     author = models.ForeignKey(
