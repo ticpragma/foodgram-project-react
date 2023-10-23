@@ -100,7 +100,7 @@ def ingredient_amount_create(recipe, ingredients):
                 recipe=recipe,
                 ingredient=Ingredient.objects.all().get(
                     id=ingredient['ingredient_id']),
-                    amount=ingredient['amount']
+                amount=ingredient['amount']
             )
         )
     IngredientAmount.objects.bulk_create(objs)
