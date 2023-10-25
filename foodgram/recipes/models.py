@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import UniqueConstraint
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from core.consts import MAX_COOK_AMOUNT_TIME, MIN_COOK_AMOUNT_TIME
+
 User = get_user_model()
 
 
@@ -85,7 +87,10 @@ class Recipe(models.Model):
         help_text='Сделайте описание'
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=(MinValueValidator(1), MaxValueValidator(32000)),
+        validators=(
+            MinValueValidator(MIN_COOK_AMOUNT_TIME),
+            MaxValueValidator(MAX_COOK_AMOUNT_TIME)
+        ),
         verbose_name='Время приготовления',
         help_text='Введите сколько готовить'
     )
@@ -127,7 +132,10 @@ class IngredientAmount(models.Model):
         verbose_name='Ингредиент'
     )
     amount = models.PositiveSmallIntegerField(
-        validators=(MinValueValidator(1), MaxValueValidator(32000)),
+        validators=(
+            MinValueValidator(MIN_COOK_AMOUNT_TIME),
+            MaxValueValidator(MAX_COOK_AMOUNT_TIME)
+        ),
         verbose_name='Количество'
     )
 
@@ -135,8 +143,8 @@ class IngredientAmount(models.Model):
         constraints = (
             UniqueConstraint(
                 fields=(
-                    "recipe",
-                    "ingredient",
+                    'recipe',
+                    'ingredient',
                 ),
                 name='Not unique ingredient',
             ),
@@ -164,8 +172,8 @@ class Favorite(models.Model):
         constraints = (
             UniqueConstraint(
                 fields=(
-                    "recipe",
-                    "user",
+                    'recipe',
+                    'user',
                 ),
                 name='Not unique favorite',
             ),
@@ -193,8 +201,8 @@ class ShoppingCart(models.Model):
         constraints = (
             UniqueConstraint(
                 fields=(
-                    "recipe",
-                    "user",
+                    'recipe',
+                    'user',
                 ),
                 name='Not unique ShoppingCart',
             ),

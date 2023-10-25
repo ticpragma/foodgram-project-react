@@ -52,21 +52,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, )
     filterset_class = CustomFlterRecipeTags
 
-    def get_queryset(self):
-        queryset = Recipe.objects.all()
-        author = self.request.query_params.get('author', None)
-        if author is not None:
-            queryset = queryset.filter(author=author)
-        is_in_shopping_cart = (
-            self.request.query_params.get(
-                'is_in_shopping_cart', None))
-        if is_in_shopping_cart is not None and is_in_shopping_cart == '1':
-            queryset = queryset.filter(favorite__user_id=self.request.user.id)
-        is_favorited = self.request.query_params.get('is_favorited', None)
-        if is_favorited is not None and is_favorited == '1':
-            queryset = queryset.filter(cart__user=self.request.user.id)
-        return queryset
-
     def get_serializer_class(self):
         if self.action in ('list',):
             return RecipeListSerializer
@@ -139,13 +124,9 @@ class DownloadShoppingCartAPIView(APIView):
         for ingredient_amount in ingr_amount:
             ingredient = Ingredient.objects.get(
                 id=ingredient_amount.ingredient.id)
-            ingredient_dict[(
-                ingredient.name,
-                ingredient.measurement_unit)] = ingredient_dict.get(
-                (
-                    ingredient.name,
-                    ingredient.measurement_unit),
-                0) + ingredient_amount.amount
+            key = (ingredient.name, ingredient.measurement_unit)
+            ingredient_dict[key] = (
+                ingredient_dict.get(key, 0) + ingredient_amount.amount)
 
 
 class SubAPIView(APIView):

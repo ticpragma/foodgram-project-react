@@ -7,6 +7,7 @@ from .models import (Tag,
                      Recipe,
                      IngredientAmount)
 from users.models import Subscribe
+from core.consts import MAX_COOK_AMOUNT_TIME, MIN_COOK_AMOUNT_TIME
 
 
 User = get_user_model()
@@ -54,7 +55,10 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 class AddIngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='ingredient_id')
-    amount = serializers.IntegerField(min_value=1)
+    amount = serializers.IntegerField(
+        min_value=MIN_COOK_AMOUNT_TIME,
+        max_value=MAX_COOK_AMOUNT_TIME
+    )
     name = serializers.SerializerMethodField()
     measurement_unit = serializers.SerializerMethodField()
 
@@ -85,12 +89,8 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
-        if user.is_authenticated:
-            if Subscribe.objects.filter(
-                    author=User.objects.get(id=obj.id), user=user).exists():
-                return True
-        return False
-
+        return (user.is_authenticated
+                and user.current_user.all().filter(author=obj).exists())
 
 def ingredient_amount_create(recipe, ingredients):
     objs = []
@@ -115,7 +115,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    cooking_time = serializers.IntegerField(max_value=32000, min_value=1)
+    cooking_time = serializers.IntegerField(
+        max_value=MAX_COOK_AMOUNT_TIME,
+        min_value=MIN_COOK_AMOUNT_TIME
+    )
 
     class Meta:
         model = Recipe
