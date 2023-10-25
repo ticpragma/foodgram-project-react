@@ -5,7 +5,7 @@ from csv import DictReader
 from recipes.models import Ingredient
 
 
-file_path = f'{Path(__file__).parent.parent.parent.parent.parent}\data'
+file_path = rf'{Path(__file__).parent.parent.parent.parent.parent}\data'
 
 
 def import_csv():
