@@ -39,7 +39,7 @@ class CustomFlterRecipeTags(filters.FilterSet):
             'is_favorited',
             'is_in_shopping_cart'
         ]
-    
+
     def filter_is_favorited(self, queryset, u, value):
         user = self.request.user
         if value and user.is_authenticated:

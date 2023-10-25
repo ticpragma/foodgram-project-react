@@ -6,7 +6,6 @@ from .models import (Tag,
                      Ingredient,
                      Recipe,
                      IngredientAmount)
-from users.models import Subscribe
 from core.consts import MAX_COOK_AMOUNT_TIME, MIN_COOK_AMOUNT_TIME
 
 
@@ -91,6 +90,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         return (user.is_authenticated
                 and user.current_user.all().filter(author=obj).exists())
+
 
 def ingredient_amount_create(recipe, ingredients):
     objs = []

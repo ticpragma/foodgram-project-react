@@ -1,4 +1,3 @@
-import datetime
 from django.core.management import BaseCommand
 from pathlib import Path
 from csv import DictReader
@@ -19,8 +18,8 @@ def import_csv():
         )
         data.save()
     print('завершена успешно.\n\n'
-            '================================================'
-            '\n')
+    '================================================'
+    '\n')
 
 
 class Command(BaseCommand):
