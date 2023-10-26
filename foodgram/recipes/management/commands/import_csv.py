@@ -5,11 +5,8 @@ from csv import DictReader
 from recipes.models import Ingredient
 
 
-file_path = rf'{Path(__file__).parent.parent.parent.parent.parent}\data'
-
-
 def import_csv():
-    file = f'{file_path}/ingredients.csv'
+    file = f'{Path(__file__).parent.parent.parent.parent}/data/ingredients.csv'
 
     for item in DictReader(open(file, encoding='utf-8')):
         data = Ingredient(
@@ -18,8 +15,8 @@ def import_csv():
         )
         data.save()
     print('завершена успешно.\n\n'
-          '================================================'
-          '\n')
+            '================================================'
+            '\n')
 
 
 class Command(BaseCommand):
