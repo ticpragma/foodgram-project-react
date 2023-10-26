@@ -1,6 +1,7 @@
 from djoser.views import UserViewSet
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
+from .serializers import CustomUserSerializerSub
 
 
 class DjoserUserViewSet(UserViewSet):

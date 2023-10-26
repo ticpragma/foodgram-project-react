@@ -146,6 +146,7 @@ class SubAPIView(APIView):
                                                          context=context)
                 return Response(status=status.HTTP_201_CREATED,
                                 data=serializer.data)
+            
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):

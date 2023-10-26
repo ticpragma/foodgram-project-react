@@ -44,15 +44,16 @@ class CustomFlterRecipeTags(filters.FilterSet):
         user = self.request.user
         if value and user.is_authenticated:
             return queryset.filter(favorite__user=user)
+        return queryset
 
     def filter_is_in_shopping_cart(self, queryset, u, value):
         user = self.request.user
         if value and user.is_authenticated:
             return queryset.filter(cart__user=user)
+        return queryset
 
     def filter_author(self, queryset, name, value):
         user = self.request.user
         if value and user.is_authenticated:
             return queryset.filter(author=value)
-        else:
-            return queryset
+        return queryset
